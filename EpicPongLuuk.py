@@ -140,6 +140,7 @@ class Points:
             self.gamestate = STATE_GAME_OVER
             ball.position_x = CENTERSCREEN_X
             ball.position_y = 20
+            print(self.gamestate)
 
     def draw(self, scoreb, scorey, scorey_x, scorey_y, scoreb_x, scoreb_y):
         """ Tell to our Points class how it should draw it. """
@@ -148,15 +149,15 @@ class Points:
 
         arcade.draw_point(scoreb_x, scoreb_y, self.color, 0)
         arcade.draw_text(f"{self.scoreb}", self.scoreb_x, self.scoreb_y, self.color, 32, width=200, align="center", anchor_x="center", anchor_y="center")
-
-        if self.scoreb >= 3:
-            arcade.draw_point(CENTERSCREEN_X, CENTERSCREEN_Y, self.color, 0)
-            arcade.draw_text(f"THE BOT WON!\nPress the space bar \nto play again", CENTERSCREEN_X, CENTERSCREEN_Y-20,
-                             self.color, 32, width=500, align="center", anchor_x="center", anchor_y="center")
-        if self.scorey >= 3:
-            arcade.draw_point(CENTERSCREEN_X, CENTERSCREEN_Y, self.color, 0)
-            arcade.draw_text(f"YOU WON!\nPress the space bar \nto play again", CENTERSCREEN_X, CENTERSCREEN_Y-20,
-                             self.color, 32, width=500, align="center", anchor_x="center", anchor_y="center")
+        if STATE_GAME_OVER:
+            if self.scoreb >= 3:
+                arcade.draw_point(CENTERSCREEN_X, CENTERSCREEN_Y, self.color, 0)
+                arcade.draw_text(f"THE BOT WON!\nPress the space bar \nto play again", CENTERSCREEN_X, CENTERSCREEN_Y-20,
+                                 self.color, 32, width=500, align="center", anchor_x="center", anchor_y="center")
+            if self.scorey >= 3:
+                arcade.draw_point(CENTERSCREEN_X, CENTERSCREEN_Y, self.color, 0)
+                arcade.draw_text(f"YOU WON!\nPress the space bar \nto play again", CENTERSCREEN_X, CENTERSCREEN_Y-20,
+                                 self.color, 32, width=500, align="center", anchor_x="center", anchor_y="center")
 
 
 class MyGame(arcade.Window):
@@ -175,8 +176,8 @@ class MyGame(arcade.Window):
 
         """ Some local variables """
         self.game_state = 0  # menu
-        self.game_state = 1  # playing
-        self.game_state = 2  # game over
+        # self.game_state = 1  # playing
+        # self.game_state = 2  # game over
 
     def on_setup(self):
         self.game_state = STATE_MENU
@@ -229,10 +230,9 @@ class MyGame(arcade.Window):
             self.color_mode = not self.color_mode
 
         elif key == arcade.key.SPACE:
-            if self.game_state != 1:
-                self.game_state = 1
-                SCOREYOU = 0
-                SCOREBOT = 0
+            SCOREYOU = 0
+            SCOREBOT = 0
+            self.game_state = 1
 
     def on_key_release(self, key, modifiers):
         """ Called whenever the user releases a key. """

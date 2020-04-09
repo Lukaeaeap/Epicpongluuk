@@ -9,8 +9,8 @@ SCREEN_TITLE = "Pong"
 
 MOVEMENT_SPEED = 250
 
-PADDLE_SPEED = 100
-PADDLE_BOT_SPEED = 85
+PADDLE_SPEED = 200
+PADDLE_BOT_SPEED = 200
 PADDLE_HUMAN_START_X = 15
 PADDLE_BOT_START_X = SCREEN_WIDTH-15
 SCOREYOU = 0
@@ -120,6 +120,8 @@ class Points:
         self.scoreb_y = scoreb_y
         self.color = color
 
+        self.Spacebar = arcade.Sprite("Pongsprites/Spacebar.png", scale=0.6, center_x=CENTERSCREEN_X, center_y=CENTERSCREEN_Y-100)
+
     def update(self, ball, bot, gamestate):
         """ Tell to our Points class how it should update it. """
         # Add points to the bot if the bot scores
@@ -137,19 +139,22 @@ class Points:
             bot.position_y = SCREEN_HEIGHT/2
 
         if self.scoreb >= 3 or self.scorey >= 3:
-            self.gamestate = STATE_GAME_OVER
-            ball.position_x = CENTERSCREEN_X
-            ball.position_y = 20
-            print(self.gamestate)
+            ball.position_x = SCREEN_WIDTH + 30
+            ball.position_y = CENTERSCREEN_Y
+            # print(self.gamestate)
+        if gamestate == STATE_MENU:
+            ball.position_x = SCREEN_WIDTH + 30
+            ball.position_y = CENTERSCREEN_Y
 
-    def draw(self, scoreb, scorey, scorey_x, scorey_y, scoreb_x, scoreb_y):
+    def draw(self, scoreb, scorey, scorey_x, scorey_y, scoreb_x, scoreb_y, gamestate):
         """ Tell to our Points class how it should draw it. """
         arcade.draw_point(scorey_x, scorey_y, self.color, 0)
         arcade.draw_text(f"{self.scorey}", self.scorey_x, self.scorey_y, self.color, 32, width=200, align="center", anchor_x="center", anchor_y="center")
 
         arcade.draw_point(scoreb_x, scoreb_y, self.color, 0)
         arcade.draw_text(f"{self.scoreb}", self.scoreb_x, self.scoreb_y, self.color, 32, width=200, align="center", anchor_x="center", anchor_y="center")
-        if STATE_GAME_OVER:
+
+        if gamestate == STATE_GAME_OVER:
             if self.scoreb >= 3:
                 arcade.draw_point(CENTERSCREEN_X, CENTERSCREEN_Y, self.color, 0)
                 arcade.draw_text(f"THE BOT WON!\nPress the space bar \nto play again", CENTERSCREEN_X, CENTERSCREEN_Y-20,
@@ -158,6 +163,11 @@ class Points:
                 arcade.draw_point(CENTERSCREEN_X, CENTERSCREEN_Y, self.color, 0)
                 arcade.draw_text(f"YOU WON!\nPress the space bar \nto play again", CENTERSCREEN_X, CENTERSCREEN_Y-20,
                                  self.color, 32, width=500, align="center", anchor_x="center", anchor_y="center")
+        if gamestate == STATE_MENU:
+            arcade.draw_point(CENTERSCREEN_X, CENTERSCREEN_Y, self.color, 0)
+            arcade.draw_text(f"Press the space bar \nto start playing", CENTERSCREEN_X, CENTERSCREEN_Y-20,
+                             self.color, 32, width=500, align="center", anchor_x="center", anchor_y="center")
+            self.Spacebar.draw()
 
 
 class MyGame(arcade.Window):
@@ -167,19 +177,28 @@ class MyGame(arcade.Window):
         super().__init__(width, height, title)
         arcade.set_background_color(COLORA)
 
-        """ Give the classes inits there parameters. """
-        self.ball = Ball(CENTERSCREEN_X, CENTERSCREEN_Y, MOVEMENT_SPEED, MOVEMENT_SPEED, 15, COLORB)
-        self.player_a = Paddle(PADDLE_HUMAN_START_X, CENTERSCREEN_Y, 0, 0, 15, 100, COLORB, "human", "player_a")
-        self.player_b = Paddle(PADDLE_BOT_START_X, CENTERSCREEN_Y, 0, 0, 15, 100, COLORB, "bot", "player_b")
-        self.points = Points(SCOREBOT, SCOREYOU, SCREEN_WIDTH/3, SCREEN_HEIGHT-15, (SCREEN_WIDTH/3)*2, SCREEN_HEIGHT-15, COLORB)
-        self.color_mode = COLORMODE
+        self.ball = None
 
-        """ Some local variables """
-        self.game_state = 0  # menu
-        # self.game_state = 1  # playing
-        # self.game_state = 2  # game over
+        self.player_a = None
+        self.player_b = None
+
+        self.points = None
+
+        self.color_mode = None
+
+        self.game_state = None
 
     def on_setup(self):
+        """ Give the classes inits there parameters. """
+        self.ball = Ball(CENTERSCREEN_X, CENTERSCREEN_Y, MOVEMENT_SPEED, MOVEMENT_SPEED, 15, COLORB)
+
+        self.player_a = Paddle(PADDLE_HUMAN_START_X, CENTERSCREEN_Y, 0, 0, 15, 100, COLORB, "human", "player_a")
+        self.player_b = Paddle(PADDLE_BOT_START_X, CENTERSCREEN_Y, 0, 0, 15, 100, COLORB, "bot", "player_b")
+
+        self.points = Points(SCOREBOT, SCOREYOU, SCREEN_WIDTH/3, SCREEN_HEIGHT-15, (SCREEN_WIDTH/3)*2, SCREEN_HEIGHT-15, COLORB)
+
+        self.color_mode = COLORMODE
+
         self.game_state = STATE_MENU
 
     def on_draw(self):
@@ -188,7 +207,7 @@ class MyGame(arcade.Window):
         self.ball.draw()
         self.player_a.draw()
         self.player_b.draw()
-        self.points.draw(SCOREBOT, SCOREYOU, SCREEN_HEIGHT-15, SCREEN_WIDTH/3, SCREEN_HEIGHT-15, (SCREEN_WIDTH/3)*2)
+        self.points.draw(SCOREBOT, SCOREYOU, SCREEN_HEIGHT-15, SCREEN_WIDTH/3, SCREEN_HEIGHT-15, (SCREEN_WIDTH/3)*2, self.game_state)
 
     def on_update(self, delta_time):
         """ Update every class every. """
@@ -197,9 +216,14 @@ class MyGame(arcade.Window):
 
         elif self.game_state == STATE_PLAYING:
             self.ball.update(self.player_a, self.player_b, delta_time)
+
             self.player_a.update(self.ball, delta_time)
             self.player_b.update(self.ball, delta_time)
+
             self.points.update(self.ball, self.player_b, self.game_state)
+            if self.points.scoreb >= 3 or self.points.scorey >= 3:
+                self.game_state = STATE_GAME_OVER
+
             # Cool color mode thing
             if self.color_mode:
                 r = random.randrange(1, 255)
@@ -221,18 +245,20 @@ class MyGame(arcade.Window):
 
     def on_key_press(self, key, modifiers):
         """ Called whenever the user presses a key. """
-        if key == arcade.key.UP:
-            self.player_a.change_y = PADDLE_SPEED
-        elif key == arcade.key.DOWN:
-            self.player_a.change_y = -PADDLE_SPEED
+        if self.game_state == STATE_PLAYING:
+            if key == arcade.key.UP:
+                self.player_a.change_y = PADDLE_SPEED
+            elif key == arcade.key.DOWN:
+                self.player_a.change_y = -PADDLE_SPEED
 
-        elif key == arcade.key.C:
-            self.color_mode = not self.color_mode
-
-        elif key == arcade.key.SPACE:
-            SCOREYOU = 0
-            SCOREBOT = 0
-            self.game_state = 1
+            elif key == arcade.key.C:
+                self.color_mode = not self.color_mode
+        elif self.game_state == STATE_MENU:
+            if key == arcade.key.SPACE:
+                self.game_state = STATE_PLAYING
+        elif self.game_state == STATE_GAME_OVER:
+            if key == arcade.key.SPACE:
+                self.on_setup()
 
     def on_key_release(self, key, modifiers):
         """ Called whenever the user releases a key. """
@@ -241,7 +267,8 @@ class MyGame(arcade.Window):
 
 
 def main():
-    MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    game.on_setup()
     arcade.run()
 
 

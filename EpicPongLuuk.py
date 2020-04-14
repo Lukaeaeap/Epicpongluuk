@@ -204,10 +204,11 @@ class MyGame(arcade.Window):
     def on_draw(self):
         """ Called whenever we need to draw the window, and draw the classes. """
         arcade.start_render()
-        self.ball.draw()
         self.player_a.draw()
         self.player_b.draw()
         self.points.draw(SCOREBOT, SCOREYOU, SCREEN_HEIGHT-15, SCREEN_WIDTH/3, SCREEN_HEIGHT-15, (SCREEN_WIDTH/3)*2, self.game_state)
+        if self.game_state == STATE_PLAYING:
+            self.ball.draw()
 
     def on_update(self, delta_time):
         """ Update every class every. """

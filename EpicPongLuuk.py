@@ -159,13 +159,16 @@ class Points:
                 arcade.draw_point(CENTERSCREEN_X, CENTERSCREEN_Y, self.color, 0)
                 arcade.draw_text(f"THE BOT WON!\nPress the space bar \nto play again", CENTERSCREEN_X, CENTERSCREEN_Y-20,
                                  self.color, 32, width=500, align="center", anchor_x="center", anchor_y="center")
+
             if self.scorey >= 3:
                 arcade.draw_point(CENTERSCREEN_X, CENTERSCREEN_Y, self.color, 0)
                 arcade.draw_text(f"YOU WON!\nPress the space bar \nto play again", CENTERSCREEN_X, CENTERSCREEN_Y-20,
                                  self.color, 32, width=500, align="center", anchor_x="center", anchor_y="center")
+            self.Spacebar.draw()
+
         if gamestate == STATE_MENU:
             arcade.draw_point(CENTERSCREEN_X, CENTERSCREEN_Y, self.color, 0)
-            arcade.draw_text(f"Press the space bar \nto start playing", CENTERSCREEN_X, CENTERSCREEN_Y-20,
+            arcade.draw_text(f"Press the space bar \nto start the game", CENTERSCREEN_X, CENTERSCREEN_Y-20,
                              self.color, 32, width=500, align="center", anchor_x="center", anchor_y="center")
             self.Spacebar.draw()
 

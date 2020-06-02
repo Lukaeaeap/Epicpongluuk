@@ -159,7 +159,7 @@ class Points:
         arcade.draw_point(scoreb_x, scoreb_y, self.color, 0)
         arcade.draw_text(f"{self.scoreb}", self.scoreb_x, self.scoreb_y, self.color, 32, width=200, align="center", anchor_x="center", anchor_y="center")
 
-        # if the game is over print who won
+        # if the game is over print who won 
         if gamestate == STATE_GAME_OVER:
             if self.scoreb >= 3:
                 arcade.draw_point(CENTERSCREEN_X, CENTERSCREEN_Y, self.color, 0)
@@ -203,11 +203,12 @@ class MyGame(arcade.Window):
         self.total_time = None
         self.yourname = None
 
+        # Load the sound effects 
         self.sound1 = arcade.Sound("Pongsprites/Pongbliep.wav")
         self.sound2 = arcade.Sound("Pongsprites/Pongbliep2.wav")
 
     def on_setup(self):
-        """ Give the classes inits there parameters. """
+        # Ask the user for its name in the terminal, then print out a bunch of text with instructions.
         self.yourname = input("Please enter your name: ")
         for i in range(20):
             if i == 1:
@@ -215,6 +216,7 @@ class MyGame(arcade.Window):
             if i == 15:
                 print(colored('The game is made by Luuk Hoekstra\nCredits to: Cas, Kuno and Lex for helping with the coding\nMade with the python arcade, random and tempcolor libraries\nPress c for colormode\nPress space to start\nUse the up and down keys to move your paddle\nGood luck!', 'cyan', attrs=['bold']))
 
+        """ Give the classes inits there parameters. """
         self.color_mode = COLORMODE
         COLORB = arcade.color.WHITE
 
@@ -238,7 +240,7 @@ class MyGame(arcade.Window):
             self.player_b.draw()
             self.ball.draw()
 
-        # Stuff for the game over timer
+        # Stuff for the game over timer first we actually define what minutes and seconds are then we will print them
         minutes = int(self.total_time) // 60
         seconds = int(self.total_time) % 60
         output = f"Time before new game starts:\n {minutes:02d}:{seconds:02d}"
